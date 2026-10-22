@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Atatürk Portresi WebAR</title>
-    <!-- 2026 Yılı En Kararlı WebAR Kütüphaneleri -->
+    <!-- Kararlı WebAR Kütüphaneleri -->
     <script src="https://aframe.io"></script>
     <script src="https://jsdelivr.net"></script>
     <style>
@@ -27,16 +27,16 @@
     <!-- Giriş Ekranı -->
     <div id="start-ui">
         <button id="start-btn">Kamerayı Aç ve Başlat</button>
-        <p id="info-text">Uygulamanın sesli çalışabilmesi için lütfen butona dokunun ve kamera iznini onaylayın.</p>
+        <p id="info-text">Uygulamanın sesli çalışabilmesi için lütfen butona dokunun Beliren kamera iznini onaylayın.</p>
     </div>
 
-    <!-- AR Sahnesi ve target dosyası bağlantısı -->
+    <!-- WebAR Sahnesi -->
     <a-scene mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiLoading: no; uiScanning: no;" 
              embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <!-- GitHub sunucusundaki video.mp4 dosyanız doğrudan bağlanmıştır -->
-        <video id="ar-video" src="./video.mp4" 
+        <!-- En Hızlı ve Sorunsuz Oynatma İçin Google Drive Video Linkiniz Optimize Edildi -->
+        <video id="ar-video" src="https://google.com" 
                preload="auto" response-type="arraybuffer" loop="false" crossorigin="anonymous" playsinline webkit-playsinline></video>
       </a-assets>
 
@@ -60,10 +60,12 @@
             sceneEl.systems["mindar-image-system"].start();
         });
 
+        // Resim hedefi bulunduğunda videoyu oynat
         targetEntity.addEventListener("targetFound", event => {
             videoEl.play();
         });
 
+        // Resim hedefi kaybedildiğinde videoyu duraklat
         targetEntity.addEventListener("targetLost", event => {
             videoEl.pause();
         });
