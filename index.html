@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>Atatürk Portresi WebAR</title>
-    <!-- iOS ile Tam Uyumlu Güvenli Kütüphane Sürümleri -->
+    <!-- iOS Uyumlu Güvenli Kütüphaneler -->
     <script src="https://cloudflare.com" crossorigin="anonymous"></script>
-    <script src="https://jsdelivr.net" crossorigin="anonymous"></script>
+    <script src="https://jsdelivr.net"></script>
+    <!-- Vimeo API Kütüphanesi -->
+    <script src="https://vimeo.com"></script>
     <style>
-        body { margin: 0; overflow: hidden; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; overflow: hidden; font-family: sans-serif; }
         #start-ui {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #0f172a; z-index: 9999;
@@ -17,29 +19,28 @@
         #start-btn {
             padding: 16px 32px; font-size: 1.25rem; background: #e11d48; color: white;
             border: none; border-radius: 30px; cursor: pointer; font-weight: bold;
-            box-shadow: 0 4px 20px rgba(225, 29, 72, 0.5); display: block;
+            box-shadow: 0 4px 20px rgba(225, 29, 72, 0.5);
         }
-        #info-text { margin-top: 15px; color: #94a3b8; font-size: 0.9rem; text-align: center; padding: 0 20px; line-height: 1.4; }
+        #info-text { margin-top: 15px; color: #94a3b8; font-size: 0.9rem; text-align: center; padding: 0 20px; }
+        #ar-video-container { display: none; }
     </style>
 </head>
 <body>
 
-    <!-- iOS Güvenlik Duvarını Aşmak İçin Tetikleyici Buton -->
     <div id="start-ui">
         <button id="start-btn" onclick="arSisteminiBaslat()">Kamerayı Aç ve Başlat</button>
         <p id="info-text">Deneyimin sesli çalışabilmesi için lütfen butona dokunun ve kamera iznini onaylayın.</p>
     </div>
 
-    <!-- iOS İçin Optimize Edilmiş AR Sahnesi -->
+    <!-- %100 Reklamsız Vimeo Gömme Alanı -->
+    <div id="ar-video-container">
+        <!-- DIKKAT: Aşağıdaki 'VIMEO_VIDEO_ID' yerine Vimeo'dan aldığınız rakam kodunu yazın -->
+        <iframe id="ar-video" src="1238680671" allow="autoplay"></iframe>
+    </div>
+
     <a-scene mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiLoading: no; uiScanning: no;" 
              embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights: false" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
-      <a-assets>
-        <!-- Sunucumuzda zaten yüklü olan video.mp4 dosyanız doğrudan bağlandı -->
-        <video id="ar-video" src="./video.mp4" 
-               preload="auto" loop="false" crossorigin="anonymous" playsinline webkit-playsinline></video>
-      </a-assets>
-
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       
@@ -48,30 +49,29 @@
     </a-scene>
 
     <script>
-        const videoEl = document.querySelector('#ar-video');
-        const targetEntity = document.querySelector('#target-entity');
+        let vimeoPlayer;
+
+        window.addEventListener('load', () => {
+            const iframe = document.querySelector('#ar-video');
+            vimeoPlayer = new Vimeo.Player(iframe);
+        });
 
         function arSisteminiBaslat() {
-            // iOS'ta sesin açılması için kullanıcının dokunduğu an videoyu arka planda yükleyip sessize alıyoruz
-            videoEl.play().then(() => {
-                videoEl.pause();
-                videoEl.volume = 1;
-            }).catch(err => console.log("İlk yükleme:", err));
-
             document.querySelector('#start-ui').style.display = 'none';
             const sceneEl = document.querySelector('a-scene');
-            
             if (sceneEl.systems && sceneEl.systems["mindar-image-system"]) {
                 sceneEl.systems["mindar-image-system"].start();
             }
         }
 
+        const targetEntity = document.querySelector('#target-entity');
+
         targetEntity.addEventListener("targetFound", () => {
-            videoEl.play().catch(err => console.log("iOS Ses Engeli:", err));
+            if (vimeoPlayer) vimeoPlayer.play();
         });
 
         targetEntity.addEventListener("targetLost", () => {
-            videoEl.pause();
+            if (vimeoPlayer) vimeoPlayer.pause();
         });
     </script>
 </body>
