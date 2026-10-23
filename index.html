@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>Atatürk Portresi WebAR</title>
-    <!-- Telefon korumasını aşmak için optimize edilmiş yerel kütüphane bağlantıları -->
+    <!-- iOS ile Tam Uyumlu Güvenli Kütüphane Sürümleri -->
     <script src="https://cloudflare.com" crossorigin="anonymous"></script>
     <script src="https://jsdelivr.net" crossorigin="anonymous"></script>
     <style>
@@ -24,18 +24,19 @@
 </head>
 <body>
 
-    <!-- Tarayıcı kısıtlamalarını aşmak için basitleştirilmiş arayüz -->
+    <!-- iOS Güvenlik Duvarını Aşmak İçin Tetikleyici Buton -->
     <div id="start-ui">
-        <button id="start-btn" onclick="başlat()">Kamerayı Aç ve Başlat</button>
+        <button id="start-btn" onclick="arSisteminiBaslat()">Kamerayı Aç ve Başlat</button>
         <p id="info-text">Deneyimin sesli çalışabilmesi için lütfen butona dokunun ve kamera iznini onaylayın.</p>
     </div>
 
-    <!-- Güvenli modda AR sahnesi -->
+    <!-- iOS İçin Optimize Edilmiş AR Sahnesi -->
     <a-scene mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiLoading: no; uiScanning: no;" 
              embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights: false" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <video id="ar-video" src="https://google.com" 
+        <!-- Sunucumuzda zaten yüklü olan video.mp4 dosyanız doğrudan bağlandı -->
+        <video id="ar-video" src="./video.mp4" 
                preload="auto" loop="false" crossorigin="anonymous" playsinline webkit-playsinline></video>
       </a-assets>
 
@@ -47,21 +48,26 @@
     </a-scene>
 
     <script>
-        function başlat() {
+        const videoEl = document.querySelector('#ar-video');
+        const targetEntity = document.querySelector('#target-entity');
+
+        function arSisteminiBaslat() {
+            // iOS'ta sesin açılması için kullanıcının dokunduğu an videoyu arka planda yükleyip sessize alıyoruz
+            videoEl.play().then(() => {
+                videoEl.pause();
+                videoEl.volume = 1;
+            }).catch(err => console.log("İlk yükleme:", err));
+
             document.querySelector('#start-ui').style.display = 'none';
             const sceneEl = document.querySelector('a-scene');
             
-            // Kütüphanenin donmasını engelleyen güvenli tetikleme
             if (sceneEl.systems && sceneEl.systems["mindar-image-system"]) {
                 sceneEl.systems["mindar-image-system"].start();
             }
         }
 
-        const videoEl = document.querySelector('#ar-video');
-        const targetEntity = document.querySelector('#target-entity');
-
         targetEntity.addEventListener("targetFound", () => {
-            videoEl.play().catch(err => console.log("Ses engeli:", err));
+            videoEl.play().catch(err => console.log("iOS Ses Engeli:", err));
         });
 
         targetEntity.addEventListener("targetLost", () => {
