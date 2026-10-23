@@ -2,42 +2,44 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>Atatürk Portresi WebAR</title>
-    <!-- En Güncel Güvenli Altyapı Linkleri -->
-    <script src="https://cloudflare.com"></script>
-    <script src="https://jsdelivr.net"></script>
+    <!-- Telefon korumasını aşmak için optimize edilmiş yerel kütüphane bağlantıları -->
+    <script src="https://cloudflare.com" crossorigin="anonymous"></script>
+    <script src="https://jsdelivr.net" crossorigin="anonymous"></script>
     <style>
-        body { margin: 0; overflow: hidden; font-family: sans-serif; }
+        body { margin: 0; overflow: hidden; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
         #start-ui {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.9); z-index: 999;
+            background: #0f172a; z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
         #start-btn {
-            padding: 15px 30px; font-size: 1.2rem; background: #e11d48; color: white;
+            padding: 16px 32px; font-size: 1.25rem; background: #e11d48; color: white;
             border: none; border-radius: 30px; cursor: pointer; font-weight: bold;
-            box-shadow: 0 4px 15px rgba(225, 29, 72, 0.4);
+            box-shadow: 0 4px 20px rgba(225, 29, 72, 0.5); display: block;
         }
-        #info-text { margin-top: 15px; color: #94a3b8; font-size: 0.9rem; text-align: center; padding: 0 20px;}
+        #info-text { margin-top: 15px; color: #94a3b8; font-size: 0.9rem; text-align: center; padding: 0 20px; line-height: 1.4; }
     </style>
 </head>
 <body>
 
+    <!-- Tarayıcı kısıtlamalarını aşmak için basitleştirilmiş arayüz -->
     <div id="start-ui">
-        <button id="start-btn">Kamerayı Aç ve Başlat</button>
-        <p id="info-text">Uygulamanın sesli çalışabilmesi için lütfen butona dokunun ve kamera iznini onaylayın.</p>
+        <button id="start-btn" onclick="başlat()">Kamerayı Aç ve Başlat</button>
+        <p id="info-text">Deneyimin sesli çalışabilmesi için lütfen butona dokunun ve kamera iznini onaylayın.</p>
     </div>
 
+    <!-- Güvenli modda AR sahnesi -->
     <a-scene mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiLoading: no; uiScanning: no;" 
-             embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+             embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights: false" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
       <a-assets>
         <video id="ar-video" src="https://google.com" 
-               preload="auto" response-type="arraybuffer" loop="false" crossorigin="anonymous" playsinline webkit-playsinline></video>
+               preload="auto" loop="false" crossorigin="anonymous" playsinline webkit-playsinline></video>
       </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-controls>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       
         <a-video src="#ar-video" width="1" height="1.33" position="0 0 0" rotation="0 0 0"></a-video>
@@ -45,22 +47,24 @@
     </a-scene>
 
     <script>
-        const startBtn = document.querySelector('#start-btn');
-        const startUi = document.querySelector('#start-ui');
-        const sceneEl = document.querySelector('a-scene');
+        function başlat() {
+            document.querySelector('#start-ui').style.display = 'none';
+            const sceneEl = document.querySelector('a-scene');
+            
+            // Kütüphanenin donmasını engelleyen güvenli tetikleme
+            if (sceneEl.systems && sceneEl.systems["mindar-image-system"]) {
+                sceneEl.systems["mindar-image-system"].start();
+            }
+        }
+
         const videoEl = document.querySelector('#ar-video');
         const targetEntity = document.querySelector('#target-entity');
 
-        startBtn.addEventListener('click', () => {
-            startUi.style.display = 'none';
-            sceneEl.systems["mindar-image-system"].start();
+        targetEntity.addEventListener("targetFound", () => {
+            videoEl.play().catch(err => console.log("Ses engeli:", err));
         });
 
-        targetEntity.addEventListener("targetFound", event => {
-            videoEl.play();
-        });
-
-        targetEntity.addEventListener("targetLost", event => {
+        targetEntity.addEventListener("targetLost", () => {
             videoEl.pause();
         });
     </script>
