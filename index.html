@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Atatürk Portresi WebAR</title>
-    <!-- Kararlı WebAR Kütüphaneleri -->
-    <script src="https://aframe.io"></script>
+    <!-- En Güncel Güvenli Altyapı Linkleri -->
+    <script src="https://cloudflare.com"></script>
     <script src="https://jsdelivr.net"></script>
     <style>
         body { margin: 0; overflow: hidden; font-family: sans-serif; }
@@ -24,25 +24,21 @@
 </head>
 <body>
 
-    <!-- Giriş Ekranı -->
     <div id="start-ui">
         <button id="start-btn">Kamerayı Aç ve Başlat</button>
-        <p id="info-text">Uygulamanın sesli çalışabilmesi için lütfen butona dokunun Beliren kamera iznini onaylayın.</p>
+        <p id="info-text">Uygulamanın sesli çalışabilmesi için lütfen butona dokunun ve kamera iznini onaylayın.</p>
     </div>
 
-    <!-- WebAR Sahnesi -->
     <a-scene mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiLoading: no; uiScanning: no;" 
              embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <!-- En Hızlı ve Sorunsuz Oynatma İçin Google Drive Video Linkiniz Optimize Edildi -->
         <video id="ar-video" src="https://google.com" 
                preload="auto" response-type="arraybuffer" loop="false" crossorigin="anonymous" playsinline webkit-playsinline></video>
       </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-controls>
 
-      <!-- Portre algılandığında videonun yerleşeceği alan -->
       
         <a-video src="#ar-video" width="1" height="1.33" position="0 0 0" rotation="0 0 0"></a-video>
       
@@ -60,12 +56,10 @@
             sceneEl.systems["mindar-image-system"].start();
         });
 
-        // Resim hedefi bulunduğunda videoyu oynat
         targetEntity.addEventListener("targetFound", event => {
             videoEl.play();
         });
 
-        // Resim hedefi kaybedildiğinde videoyu duraklat
         targetEntity.addEventListener("targetLost", event => {
             videoEl.pause();
         });
